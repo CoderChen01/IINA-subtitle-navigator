@@ -95,7 +95,7 @@ This project is intended to be:
 
 ### Demo | 演示视频
 
-Uploading demo.mp4…
+https://github.com/user-attachments/assets/59d68ece-2736-4c01-a10f-d4906d04145e
 
 ### Reopen the window | 重新打开窗口
 If you close the window:
