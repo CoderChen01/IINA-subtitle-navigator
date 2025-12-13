@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="window.css" />
+  <title>Subtitle Navigator</title>
+</head>
+<body>
+  <div class="toolbar">
+    <div class="row">
+      <label class="lbl">Subtitle</label>
+      <select id="track"></select>
+    </div>
+    <div class="row grow">
+      <input id="q" placeholder="Search..." />
+    </div>
+    <button id="reload">Reload</button>
+  </div>
+
+  <div class="toolbar2">
+    <button id="jumpCurrent">Jump to Current Line</button>
+    <button id="scrollCurrent">Scroll to Current</button>
+    <label class="chk"><input type="checkbox" id="loopToggle"> Loop current line</label>
+    <button id="copySel">Copy Selected</button>
+    <button id="clearSel">Clear</button>
+  </div>
+
+  <div class="toolbar3">
+    <div class="row">
+      <label class="lbl">Jump to (hh:mm:ss)</label>
+      <input id="hh" type="number" min="0" step="1" placeholder="hh" class="timeBox" />
+      <span>:</span>
+      <input id="mm" type="number" min="0" max="59" step="1" placeholder="mm" class="timeBox" />
+      <span>:</span>
+      <input id="ss" type="number" min="0" max="59" step="1" placeholder="ss" class="timeBox" />
+      <button id="jumpTime">Go</button>
+    </div>
+  </div>
+
+  <div class="live" id="live" title="Click to seek to this line">
+    <div class="liveLine" id="liveText"></div>
+  </div>
+
+  <div id="meta" class="meta"></div>
+  <div id="list" class="list"></div>
+
+  <script src="window.js"></script>
+</body>
+</html>

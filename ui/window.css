@@ -1,0 +1,24 @@
+:root { color-scheme: light dark; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 10px; }
+.toolbar, .toolbar2, .toolbar3 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar2 { margin-top: 8px; }
+.toolbar3 { margin-top: 8px; }
+.toolbar .row, .toolbar3 .row { display: flex; gap: 6px; align-items: center; }
+.toolbar .grow { flex: 1; min-width: 220px; }
+.lbl { font-size: 12px; opacity: 0.8; }
+select, input { padding: 6px 8px; }
+button { padding: 6px 10px; }
+.timeBox { width: 52px; }
+.chk { font-size: 12px; opacity: 0.9; display: flex; gap: 6px; align-items: center; }
+
+.live { margin-top: 10px; padding: 8px; border: 1px solid rgba(127,127,127,0.25); border-radius: 8px; cursor: pointer; }
+.liveLine { white-space: pre-wrap; line-height: 1.35; }
+
+.meta { margin: 10px 0; opacity: 0.75; font-size: 12px; word-break: break-all; }
+.list { border-top: 1px solid rgba(127,127,127,0.25); width: 100%; box-sizing: border-box; }
+.item { padding: 8px 6px; border-bottom: 1px solid rgba(127,127,127,0.18); cursor: pointer; width: 100%; box-sizing: border-box; }
+.item:hover { background: rgba(127,127,127,0.10); }
+.item.selected { outline: 2px solid rgba(127,127,127,0.35); outline-offset: -2px; }
+.item.current { background: rgba(127,127,127,0.14); }
+.time { font-size: 12px; opacity: 0.75; margin-bottom: 6px; }
+.line { white-space: pre-wrap; line-height: 1.35; }

@@ -1,0 +1,55 @@
+name: Build & Release IINA Plugin
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate plugin structure
+        run: |
+          test -f Info.json
+          test -f main.js
+          test -d ui
+
+      - name: Read version from Info.json
+        id: ver
+        run: |
+          python3 - << 'PY'
+          import json
+          with open("Info.json","r",encoding="utf-8") as f:
+            info=json.load(f)
+          v=str(info.get("version","0.0.0"))
+          print(f"version={v}")
+          PY
+          # Export to GitHub output
+          echo "version=$(python3 -c 'import json;print(json.load(open("Info.json",encoding="utf-8")).get("version","0.0.0"))')" >> "$GITHUB_OUTPUT"
+
+      - name: Package .iinaplgz
+        run: |
+          mkdir -p dist
+          OUT="SubtitleNavigator_v${{ steps.ver.outputs.version }}.iinaplgz"
+          # .iinaplgz is just a zip
+          zip -r "dist/${OUT}" Info.json main.js ui
+          ls -lah dist
+
+      - name: Create Release and upload asset (every push)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Build ${{ github.run_number }} (v${{ steps.ver.outputs.version }})
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            dist/*.iinaplgz
