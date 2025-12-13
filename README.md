@@ -95,12 +95,7 @@ This project is intended to be:
 
 ### Demo | 演示视频
 
-<video
-  src="demo.mp4"
-  controls
-  preload="metadata"
-  width="720">
-</video>
+https://github.com/CoderChen01/IINA-subtitle-navigator/blob/main/demo.mp4
 
 ### Reopen the window | 重新打开窗口
 If you close the window:
