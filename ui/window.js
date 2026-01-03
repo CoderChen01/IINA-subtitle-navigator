@@ -35,7 +35,7 @@ function applyFilter() {
   const q = document.getElementById("q").value.trim().toLowerCase();
   selected.clear();
   lastClicked = null;
-  filtered = q ? rows.filter(r => (r.text||"").toLowerCase().includes(q)) : rows.slice();
+  filtered = q ? rows.filter(r => (r.text || "").toLowerCase().includes(q)) : rows.slice();
   render();
 }
 
@@ -106,7 +106,7 @@ async function copyText(text) {
       await navigator.clipboard.writeText(text);
       return;
     }
-  } catch (_) {}
+  } catch (_) { }
   iina.postMessage("copyFallback", { text });
 }
 
@@ -116,12 +116,12 @@ function selectedRows() {
     const r = filtered[idx];
     if (r) out.push(r);
   }
-  return out.sort((a,b)=>a.start-b.start);
+  return out.sort((a, b) => a.start - b.start);
 }
 
 function scrollToIndex(idx) {
   const el = document.querySelector(`.item[data-index="${idx}"]`);
-  if (el) el.scrollIntoView({ block: "center" });
+  if (el) el.scrollIntoView({ block: "center", behavior: "smooth" }); // 增加了 smooth 滚动效果
 }
 
 /** Toolbar actions */
@@ -150,6 +150,13 @@ document.getElementById("loopToggle").addEventListener("change", () => {
   else if (currentIdx >= 0) {
     const r = filtered[currentIdx];
     if (r) iina.postMessage("loopLine", { enabled: true, start: r.start, end: r.end });
+  }
+});
+
+document.getElementById("autoScrollToggle").addEventListener("change", () => {
+  const on = document.getElementById("autoScrollToggle").checked;
+  if (on && currentIdx >= 0) {
+    scrollToIndex(currentIdx);
   }
 });
 
@@ -193,7 +200,15 @@ iina.onMessage("time", ({ t }) => {
   if (typeof t === "number" && isFinite(t)) {
     currentTime = t;
     const idx = findCurrentIndex();
-    if (idx !== currentIdx) render();
+
+    // 修改：检测到行变化时，检查是否开启了自动滚动
+    if (idx !== currentIdx) {
+      render();
+      const autoScroll = document.getElementById("autoScrollToggle")?.checked;
+      if (autoScroll && idx !== -1) {
+        scrollToIndex(idx);
+      }
+    }
   }
 });
 
@@ -208,8 +223,6 @@ iina.onMessage("liveSubtitle", (data) => {
 
 iina.postMessage("uiReady", {});
 
-
-// Notify plugin when the window is closed so it can be reopened cleanly.
 window.addEventListener('beforeunload', () => {
-  try { iina.postMessage('windowClosed', {}); } catch (_) {}
+  try { iina.postMessage('windowClosed', {}); } catch (_) { }
 });
