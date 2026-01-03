@@ -121,7 +121,7 @@ function selectedRows() {
 
 function scrollToIndex(idx) {
   const el = document.querySelector(`.item[data-index="${idx}"]`);
-  if (el) el.scrollIntoView({ block: "center", behavior: "smooth" }); // 增加了 smooth 滚动效果
+  if (el) el.scrollIntoView({ block: "center", behavior: "smooth" });
 }
 
 /** Toolbar actions */
@@ -153,11 +153,16 @@ document.getElementById("loopToggle").addEventListener("change", () => {
   }
 });
 
+// 手动切换自动滚动开关时的逻辑
 document.getElementById("autoScrollToggle").addEventListener("change", () => {
   const on = document.getElementById("autoScrollToggle").checked;
   if (on && currentIdx >= 0) {
     scrollToIndex(currentIdx);
   }
+});
+
+document.getElementById("scrollTop").addEventListener("click", () => {
+  document.getElementById("list").scrollTo({ top: 0, behavior: "smooth" });
 });
 
 document.getElementById("jumpCurrent").addEventListener("click", () => iina.postMessage("seekCurrentLine", {}));
@@ -201,7 +206,6 @@ iina.onMessage("time", ({ t }) => {
     currentTime = t;
     const idx = findCurrentIndex();
 
-    // 修改：检测到行变化时，检查是否开启了自动滚动
     if (idx !== currentIdx) {
       render();
       const autoScroll = document.getElementById("autoScrollToggle")?.checked;

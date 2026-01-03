@@ -1,24 +1,182 @@
-:root { color-scheme: light dark; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 10px; }
-.toolbar, .toolbar2, .toolbar3 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.toolbar2 { margin-top: 8px; }
-.toolbar3 { margin-top: 8px; }
-.toolbar .row, .toolbar3 .row { display: flex; gap: 6px; align-items: center; }
-.toolbar .grow { flex: 1; min-width: 220px; }
-.lbl { font-size: 12px; opacity: 0.8; }
-select, input { padding: 6px 8px; }
-button { padding: 6px 10px; }
-.timeBox { width: 52px; }
-.chk { font-size: 12px; opacity: 0.9; display: flex; gap: 6px; align-items: center; }
+:root {
+    color-scheme: light dark;
+}
 
-.live { margin-top: 10px; padding: 8px; border: 1px solid rgba(127,127,127,0.25); border-radius: 8px; cursor: pointer; }
-.liveLine { white-space: pre-wrap; line-height: 1.35; }
+/* --- 布局核心 (Flexbox) --- */
+html,
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* 禁止全局滚动 */
+}
 
-.meta { margin: 10px 0; opacity: 0.75; font-size: 12px; word-break: break-all; }
-.list { border-top: 1px solid rgba(127,127,127,0.25); width: 100%; box-sizing: border-box; }
-.item { padding: 8px 6px; border-bottom: 1px solid rgba(127,127,127,0.18); cursor: pointer; width: 100%; box-sizing: border-box; }
-.item:hover { background: rgba(127,127,127,0.10); }
-.item.selected { outline: 2px solid rgba(127,127,127,0.35); outline-offset: -2px; }
-.item.current { background: rgba(127,127,127,0.14); }
-.time { font-size: 12px; opacity: 0.75; margin-bottom: 6px; }
-.line { white-space: pre-wrap; line-height: 1.35; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* --- 工具栏样式 --- */
+.toolbar,
+.toolbar2,
+.toolbar3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.toolbar2 {
+    margin-top: 8px;
+}
+
+.toolbar3 {
+    margin-top: 8px;
+}
+
+.toolbar .row,
+.toolbar3 .row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.toolbar .grow {
+    flex: 1;
+    min-width: 220px;
+}
+
+.lbl {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+select,
+input {
+    padding: 6px 8px;
+}
+
+button {
+    padding: 6px 10px;
+}
+
+.timeBox {
+    width: 52px;
+}
+
+.chk {
+    font-size: 12px;
+    opacity: 0.9;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* --- 实时预览区 --- */
+.live {
+    margin-top: 10px;
+    padding: 8px;
+    border: 1px solid rgba(127, 127, 127, 0.25);
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.liveLine {
+    white-space: pre-wrap;
+    line-height: 1.35;
+}
+
+.meta {
+    margin: 10px 0;
+    opacity: 0.75;
+    font-size: 12px;
+    word-break: break-all;
+    flex-shrink: 0;
+}
+
+/* --- 列表区域 (独立滚动) --- */
+.list {
+    border-top: 1px solid rgba(127, 127, 127, 0.25);
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* --- 列表项样式 --- */
+.item {
+    padding: 10px 8px;
+    /* 稍微增加一点间距 */
+    border-bottom: 1px solid rgba(127, 127, 127, 0.18);
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background 0.1s;
+    /* 添加一点过渡效果 */
+}
+
+.item:hover {
+    background: rgba(127, 127, 127, 0.10);
+}
+
+/* 选中状态 (鼠标点击) */
+.item.selected {
+    outline: 2px solid rgba(127, 127, 127, 0.35);
+    outline-offset: -2px;
+}
+
+/* --- [核心修改] 当前播放行高亮样式 --- */
+.item.current {
+    /* 1. 更明显的背景色 (macOS 风格蓝，带透明度) */
+    background: rgba(0, 122, 255, 0.18);
+
+    /* 2. 左侧添加亮蓝色指示条 */
+    border-left: 5px solid #007aff;
+
+    /* 因为加了左边框，稍微调整 padding 保持文字对齐（或者让文字稍微右移一点以示区分） */
+    padding-left: 12px;
+}
+
+/* 当前行的时间戳 */
+.item.current .time {
+    color: #007aff;
+    /* 时间变成蓝色 */
+    font-weight: bold;
+    opacity: 1;
+}
+
+/* 当前行的字幕文本 */
+.item.current .line {
+    font-weight: 700;
+    /* 字体加粗 */
+    font-size: 1.15em;
+    /* 字体放大 15% */
+    color: #000;
+    /* 强制黑色 (Light模式) - 如果是 Dark 模式会自动反色吗？ */
+}
+
+/* 适配暗黑模式下的高亮文字颜色 */
+@media (prefers-color-scheme: dark) {
+    .item.current .line {
+        color: #fff;
+        /* 暗黑模式下文字亮白 */
+    }
+}
+
+.time {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-bottom: 6px;
+}
+
+.line {
+    white-space: pre-wrap;
+    line-height: 1.35;
+}
