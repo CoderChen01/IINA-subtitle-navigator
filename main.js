@@ -155,6 +155,50 @@ function parseSRT(content) {
   return out;
 }
 
+// 将ASS时间(h:mm:ss.cc)转换为秒
+function parseAssTimeToSeconds(ts) {
+  const s = String(ts).trim();
+  const m = s.match(/^(\d+):(\d{1,2}):(\d{1,2})\.(\d{2})$/);
+  if (!m) return NaN;
+  const h = Number(m[1]);
+  const mi = Number(m[2]);
+  const se = Number(m[3]);
+  const cs = Number(m[4]); // 厘秒 (1/100s)
+  return h * 3600 + mi * 60 + se + cs / 100;
+}
+
+// 解析ASS文本内容
+function parseASS(content) {
+  const lines = String(content).replace(/\r/g, "").split("\n");
+  const out = [];
+  let isEventsSection = false;
+
+  for (let line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("[Events]")) {
+      isEventsSection = true;
+      continue;
+    }
+    // 识别对话行：Dialogue: 0,0:00:01.00,0:00:03.00,...
+    if (isEventsSection && trimmed.startsWith("Dialogue:")) {
+      const parts = trimmed.split(",");
+      if (parts.length >= 10) {
+        const start = parseAssTimeToSeconds(parts[1]);
+        const end = parseAssTimeToSeconds(parts[2]);
+        // 提取第10列及之后的所有内容作为文本
+        const rawText = parts.slice(9).join(","); 
+        const text = stripCurly(rawText).replace(/\\N/gi, "\n").replace(/\\n/gi, "\n");
+        
+        if (Number.isFinite(start) && Number.isFinite(end) && end > start && text) {
+          out.push({ start, end, text });
+        }
+      }
+    }
+  }
+  out.sort((a, b) => a.start - b.start);
+  return out;
+}
+
 function getSubDelay() {
   try {
     const d = mpv.getNumber("sub-delay");
@@ -206,9 +250,26 @@ async function refresh(force=false) {
   lastStateKey = stateKey;
 
   try {
-    if (!path.toLowerCase().endsWith(".srt")) throw new Error(`Selected subtitle is not .srt: ${path}`);
-    const text = await readSubtitleTextById(trackId, path);
-    cues = parseSRT(text);
+    // if (!path.toLowerCase().endsWith(".srt")) throw new Error(`Selected subtitle is not .srt: ${path}`);
+    // const text = await readSubtitleTextById(trackId, path);
+    // cues = parseSRT(text);
+
+		const lowerPath = path.toLowerCase();
+		const isSrt = lowerPath.endsWith(".srt");
+		const isAss = lowerPath.endsWith(".ass") || lowerPath.endsWith(".ssa");
+
+		if (!isSrt && !isAss) {
+		  throw new Error(`Unsupported subtitle format: ${path}`);
+		}
+
+		const text = await readSubtitleTextById(trackId, path);
+
+		if (isSrt) {
+		  cues = parseSRT(text);
+		} else {
+		  cues = parseASS(text);
+		}
+
     rows = cues.map(c => ({ start: c.start, end: c.end, text: c.text }));
     post("setRows", { rows, meta: { count: rows.length } });
   } catch (e) {
